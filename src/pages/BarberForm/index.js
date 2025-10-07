@@ -269,11 +269,10 @@ function BarberForm() {
                   "Thursday",
                   "Friday",
                   "Saturday",
-                ].map((day, index) => (
-                  <div className="flex gap-1 items-center">
+                ].map((day) => (
+                  <div className="flex gap-1 items-center" key={day}>
                     <input
                       type="checkbox"
-                      key={index}
                       checked={days.includes(day)}
                       value={day}
                       onChange={(e) => {

@@ -8,6 +8,7 @@ import { ShowLoader } from "../../redux/loaderSlice";
 const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const onFinish = async (values) => {
     try {
       dispatch(ShowLoader(true));
@@ -16,6 +17,7 @@ const Register = () => {
         role: "user",
       });
       dispatch(ShowLoader(false));
+
       if (response.success) {
         message.success(response.message);
         navigate("/login");
@@ -27,10 +29,12 @@ const Register = () => {
       message.error(error.message);
     }
   };
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) navigate("/");
   }, []);
+
   return (
     <div className="flex justify-center h-screen p-2 my-3">
       <Form
@@ -55,7 +59,7 @@ const Register = () => {
           REGISTER
         </button>
         <Link className="underline" to="/login">
-          Already have an accout? <strong>Sign In</strong>
+          Already have an account? <strong>Sign In</strong>
         </Link>
       </Form>
     </div>

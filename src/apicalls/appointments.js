@@ -77,7 +77,7 @@ export const GetUserAppointments = async (userId) => {
     const querySnapshot = await getDocs(
       query(
         collection(firestoreDatabase, "appointments"),
-        where("userId", "==", userId)
+        where("userId", "==", userId) // userId je string
       )
     );
     const data = [];

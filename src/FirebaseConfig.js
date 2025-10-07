@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC66AuMn_CDUwmRuQlM-2NMAO_YGiBIUSw",
-  authDomain: "barber-shop-f93f9.firebaseapp.com",
-  projectId: "barber-shop-f93f9",
-  storageBucket: "barber-shop-f93f9.appspot.com",
-  messagingSenderId: "726274097890",
-  appId: "1:726274097890:web:883bb970ae99f3b5d8d4bb",
-  measurementId: "G-WJRDR72L86"
+  apiKey: "AIzaSyCJO29z_qepJ-PD3p9vkwXn7i0wWOFgET4",
+  authDomain: "barbershop-663dc.firebaseapp.com",
+  projectId: "barbershop-663dc",
+  storageBucket: "barbershop-663dc.firebasestorage.app",
+  messagingSenderId: "924900801379",
+  appId: "1:924900801379:web:d6af8342da33979c513156",
+  measurementId: "G-JPR1X7E01M",
 };
 
 const app = initializeApp(firebaseConfig);

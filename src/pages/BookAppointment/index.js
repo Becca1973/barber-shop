@@ -26,6 +26,7 @@ function BookAppointment() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [bookedSlots = [], setBookedSlots] = useState([]);
+  const loggedUser = JSON.parse(localStorage.getItem("user"));
 
   const form = useRef();
 
@@ -117,7 +118,7 @@ function BookAppointment() {
       dispatch(ShowLoader(true));
       const payload = {
         barberId: barber.id,
-        userId: 1, // vredo je tak hmmm :P
+        userId: loggedUser?.id,
         date,
         slot: selectedSlot,
         barberName: `${barber.firstName} ${barber.lastName}`,
@@ -258,11 +259,15 @@ function BookAppointment() {
                 onChange={(e) => setService(e.target.value)}
               >
                 <option></option>
-                {barber.services.map((serv) => (
-                  <option value={serv.service}>
-                    {serv.service} ({serv.price}€)
-                  </option>
-                ))}
+                {barber.services && barber.services.length > 0 ? (
+                  barber.services.map((serv) => (
+                    <option key={serv.service} value={serv.service}>
+                      {serv.service} ({serv.price}€)
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No services available</option>
+                )}
               </select>
               <label>Name:</label>
               <input
