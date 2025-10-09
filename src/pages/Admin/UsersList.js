@@ -9,7 +9,7 @@ function UsersList() {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
 
-  const loggedInUser = JSON.parse(localStorage.getItem("user")); // trenutno prijavljeni user
+  const loggedInUser = JSON.parse(localStorage.getItem("user"));
 
   const getData = async () => {
     try {
