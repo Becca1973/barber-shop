@@ -12,23 +12,30 @@ import {
 import emailjs from "@emailjs/browser";
 
 function BookAppointment() {
-  const [service = "", setService] = useState("");
-  const [userName = "", setUserName] = useState("");
-  const [email = "", setEmail] = useState("");
-  const [phoneNumber = "", setPhoneNumber] = useState("");
-  const [cardNumber = "", setCardNumber] = useState("");
-  const [description = "", setDescription] = useState("");
+  const [service, setService] = useState("");
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [description, setDescription] = useState("");
 
-  const [date = "", setDate] = useState("");
+  const [date, setDate] = useState("");
   const [barber, setBarber] = useState(null);
-  const [selectedSlot = "", setSelectedSlot] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState("");
+  const [bookedSlots, setBookedSlots] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
   const dispatch = useDispatch();
-  const [bookedSlots = [], setBookedSlots] = useState([]);
   const loggedUser = JSON.parse(localStorage.getItem("user"));
 
   const form = useRef();
+
+  // Če je uporabnik prijavljen, avtomatsko nastavi ime in email
+  useEffect(() => {
+    if (loggedUser) {
+      setUserName(loggedUser.name || "");
+      setEmail(loggedUser.email || "");
+    }
+  }, [loggedUser]);
 
   const sendEmail = (e) => {
     e.preventDefault();
@@ -40,12 +47,8 @@ function BookAppointment() {
         "LWe-UrSziUXrStoT7"
       )
       .then(
-        (result) => {
-          console.log(result.text);
-        },
-        (error) => {
-          console.log(error.text);
-        }
+        (result) => console.log(result.text),
+        (error) => console.log(error.text)
       );
     e.target.reset();
   };
@@ -54,89 +57,17 @@ function BookAppointment() {
     try {
       dispatch(ShowLoader(true));
       const response = await GetBarberById(id);
+
       if (response.success) {
-        setBarber(response.data);
+        if (response.data.status !== "approved") {
+          message.warning("This barber is not approved yet.");
+          navigate("/");
+        } else {
+          setBarber(response.data);
+        }
       } else {
         message.error(response.message);
-      }
-
-      dispatch(ShowLoader(false));
-    } catch (error) {
-      message.error(error.message);
-      dispatch(ShowLoader(false));
-    }
-  };
-
-  const getSlotsData = () => {
-    const day = moment(date).format("dddd");
-    if (!barber.days.includes(day)) {
-      return (
-        <h3>Barber is not available on {moment(date).format("DD-MM-YYYY")}</h3>
-      );
-    }
-
-    let startTime = moment(barber.startTime, "HH:mm");
-    let endTime = moment(barber.endTime, "HH:mm");
-    let slotDuration = 30;
-    const slots = [];
-    while (startTime < endTime) {
-      slots.push(startTime.format("HH:mm"));
-      startTime.add(slotDuration, "minutes");
-    }
-    return slots.map((slot) => {
-      const isBooked = bookedSlots.find(
-        (bookedSlot) =>
-          bookedSlot.slot === slot && bookedSlot.status !== "cancelled"
-      );
-      return (
-        <div>
-          <div
-            className="bg-white rounded p-1 curser-pointer w-100 text-center"
-            onClick={() => setSelectedSlot(slot)}
-            style={{
-              border:
-                selectedSlot === slot ? "3px solid green" : "1px solid gray",
-              backgroundColor: isBooked ? "#d6d6d6" : "white",
-              pointerEvents: isBooked ? "none" : "auto",
-              cursor: isBooked ? "not-allowed" : "pointer",
-            }}
-          >
-            <span>
-              {moment(slot, "HH:mm A").format("hh:mm")} -{" "}
-              {moment(slot, "HH:mm A")
-                .add(slotDuration, "minutes")
-                .format("hh:mm")}
-            </span>
-          </div>
-        </div>
-      );
-    });
-  };
-
-  const onBookAppointment = async () => {
-    try {
-      dispatch(ShowLoader(true));
-      const payload = {
-        barberId: barber.id,
-        userId: loggedUser?.id,
-        date,
-        slot: selectedSlot,
-        barberName: `${barber.firstName} ${barber.lastName}`,
-        service,
-        userName,
-        email,
-        phoneNumber,
-        cardNumber,
-        bookedOn: moment().format("DD-MM-YYYY hh:mm A"),
-        description,
-        status: "approved",
-      };
-      const response = await BookBarberAppointment(payload);
-      if (response.success) {
-        message.success(response.message);
         navigate("/");
-      } else {
-        message.error(response.message);
       }
       dispatch(ShowLoader(false));
     } catch (error) {
@@ -144,13 +75,14 @@ function BookAppointment() {
       dispatch(ShowLoader(false));
     }
   };
+
   const getBookedSlots = async () => {
+    if (!date) return;
     try {
       dispatch(ShowLoader(true));
       const response = await GetBarberAppointmentsOnDate(id, date);
       dispatch(ShowLoader(false));
       if (response.success) {
-        console.log(response.data);
         setBookedSlots(response.data);
       } else {
         message.error(response.message);
@@ -166,17 +98,97 @@ function BookAppointment() {
   }, [id]);
 
   useEffect(() => {
-    if (date) {
-      getBookedSlots();
-    }
+    getBookedSlots();
   }, [date]);
+
+ const getSlotsData = () => {
+  if (!barber) return null;
+
+  const day = moment(date).format("dddd").toLowerCase();
+  const barberDays = barber.days.map(d => d.toLowerCase());
+
+  if (!barberDays.includes(day)) {
+    return <h3>Barber is not available on {moment(date).format("DD-MM-YYYY")}</h3>;
+  }
+
+  let startTime = moment(barber.startTime, "HH:mm");
+  let endTime = moment(barber.endTime, "HH:mm");
+  const slotDuration = 30;
+  const slots = [];
+
+  while (startTime < endTime) {
+    slots.push(startTime.format("HH:mm"));
+    startTime.add(slotDuration, "minutes");
+  }
+
+  return slots.map((slot) => {
+    const isBooked = bookedSlots.find(
+      (b) => b.slot === slot && b.status !== "cancelled"
+    );
+    return (
+      <div key={slot}>
+        <div
+          className="bg-white rounded p-1 cursor-pointer w-100 text-center"
+          onClick={() => setSelectedSlot(slot)}
+          style={{
+            border: selectedSlot === slot ? "3px solid green" : "1px solid gray",
+            backgroundColor: isBooked ? "#d6d6d6" : "white",
+            pointerEvents: isBooked ? "none" : "auto",
+            cursor: isBooked ? "not-allowed" : "pointer",
+          }}
+        >
+          <span>
+            {moment(slot, "HH:mm").format("hh:mm A")} -{" "}
+            {moment(slot, "HH:mm").add(slotDuration, "minutes").format("hh:mm A")}
+          </span>
+        </div>
+      </div>
+    );
+  });
+};
+  const onBookAppointment = async () => {
+    try {
+      if (!selectedSlot || !service || !userName || !email) {
+        return message.warning("Please fill all required fields");
+      }
+
+      dispatch(ShowLoader(true));
+      const payload = {
+        barberId: barber.id,
+        userId: loggedUser?.id,
+        date,
+        slot: selectedSlot,
+        barberName: `${barber.firstName} ${barber.lastName}`,
+        service,
+        userName,
+        email,
+        phoneNumber,
+        bookedOn: moment().format("DD-MM-YYYY hh:mm A"),
+        description,
+        status: "approved",
+      };
+      const response = await BookBarberAppointment(payload);
+
+      if (response.success) {
+        message.success(response.message);
+        navigate("/");
+      } else {
+        message.error(response.message);
+      }
+
+      dispatch(ShowLoader(false));
+    } catch (error) {
+      message.error(error.message);
+      dispatch(ShowLoader(false));
+    }
+  };
 
   return (
     barber && (
       <div className="bg-white p-2 h-auto">
         <h1 className="uppercase my-1">
           <b>
-            {barber?.firstName} {barber?.lastName}
+            {barber.firstName} {barber.lastName}
           </b>
         </h1>
 
@@ -217,7 +229,6 @@ function BookAppointment() {
 
         <hr />
 
-        {/* slots here */}
         <div className="flex flex-col gap-1 my-2">
           <div>
             <h3 className="w-200 py-1">Select date:</h3>
@@ -226,9 +237,10 @@ function BookAppointment() {
               className="py-2"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              min={moment().format("DD-MM-YYYY")}
+              min={moment().format("YYYY-MM-DD")}
             />
           </div>
+
           <div className="flex gap-2 scroll-horizontal">
             {date && getSlotsData()}
           </div>
@@ -240,18 +252,27 @@ function BookAppointment() {
               onSubmit={sendEmail}
             >
               <input
-                className="none"
                 type="text"
+                className="none"
                 name="barber"
                 value={barber.firstName + " " + barber.lastName}
+                readOnly
               />
-              <input className="none" type="text" name="date" value={date} />
               <input
-                className="none"
                 type="text"
+                className="none"
+                name="date"
+                value={date}
+                readOnly
+              />
+              <input
+                type="text"
+                className="none"
                 name="selectedSlot"
                 value={selectedSlot}
+                readOnly
               />
+
               <label>Service:</label>
               <select
                 name="service"
@@ -269,27 +290,31 @@ function BookAppointment() {
                   <option disabled>No services available</option>
                 )}
               </select>
+
               <label>Name:</label>
               <input
                 type="text"
                 value={userName}
                 name="userName"
                 onChange={(e) => setUserName(e.target.value)}
-              />{" "}
+              />
+
               <label>Email:</label>
               <input
                 type="text"
                 value={email}
                 name="email"
                 onChange={(e) => setEmail(e.target.value)}
-              />{" "}
+              />
+
               <label>Phone Number:</label>
               <input
                 type="number"
                 value={phoneNumber}
                 name="phoneNumber"
                 onChange={(e) => setPhoneNumber(e.target.value)}
-              />{" "}
+              />
+
               <label>Message:</label>
               <textarea
                 placeholder="What do you need?"
@@ -298,13 +323,7 @@ function BookAppointment() {
                 onChange={(e) => setDescription(e.target.value)}
                 rows="10"
               ></textarea>
-              <label>Card Number:</label>
-              <input
-                type="number"
-                value={cardNumber}
-                name="cardNumber"
-                onChange={(e) => setCardNumber(e.target.value)}
-              />
+
               <input
                 className="contained-btn my-2"
                 type="submit"

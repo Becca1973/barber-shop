@@ -16,33 +16,27 @@ import About from "./pages/About";
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
+
   return (
     <div>
       {loading && <Spinner />}
       <BrowserRouter>
         <Routes>
+          {/* Javne strani */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Zaščitene strani */}
           <Route
             path="/"
             element={
-              <ProtectedRoute>
-                <Welcome />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <ProtectedRoute>
+              !localStorage.getItem("user") ? (
                 <Login />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/register"
-            element={
-              <ProtectedRoute>
-                <Register />
-              </ProtectedRoute>
+              ) : (
+                <ProtectedRoute>
+                  <Welcome />
+                </ProtectedRoute>
+              )
             }
           />
           <Route

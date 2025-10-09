@@ -1,46 +1,26 @@
 import firestoreDatabase from "../FirebaseConfig";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  where,
-  getDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, getDoc, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import CryptoJS from "crypto-js";
 
 // Ustvari novega uporabnika in dodaj id v dokument
 export const CreateUser = async (payload) => {
   try {
     // Preveri, če uporabnik že obstaja
-    const qry = query(
-      collection(firestoreDatabase, "users"),
-      where("email", "==", payload.email)
-    );
+    const qry = query(collection(firestoreDatabase, "users"), where("email", "==", payload.email));
     const querySnapshot = await getDocs(qry);
     if (querySnapshot.size > 0) {
       throw new Error("User already exists");
     }
 
     // Šifriraj geslo
-    const hashedPassword = CryptoJS.AES.encrypt(
-      payload.password,
-      "barber-shop"
-    ).toString();
+    const hashedPassword = CryptoJS.AES.encrypt(payload.password, "barber-shop").toString();
     payload.password = hashedPassword;
 
     // Dodaj dokument
-    const docRef = await addDoc(
-      collection(firestoreDatabase, "users"),
-      payload
-    );
+    const docRef = await addDoc(collection(firestoreDatabase, "users"), payload);
 
     // Posodobi dokument z id
-    await updateDoc(doc(firestoreDatabase, "users", docRef.id), {
-      id: docRef.id,
-    });
+    await updateDoc(doc(firestoreDatabase, "users", docRef.id), { id: docRef.id });
 
     return {
       success: true,
@@ -54,10 +34,7 @@ export const CreateUser = async (payload) => {
 // Prijava uporabnika
 export const LoginUser = async (payload) => {
   try {
-    const qry = query(
-      collection(firestoreDatabase, "users"),
-      where("email", "==", payload.email)
-    );
+    const qry = query(collection(firestoreDatabase, "users"), where("email", "==", payload.email));
     const userSnapshots = await getDocs(qry);
 
     if (userSnapshots.size === 0) {
@@ -89,10 +66,7 @@ export const LoginUser = async (payload) => {
 export const GetAllUsers = async () => {
   try {
     const usersSnapshot = await getDocs(collection(firestoreDatabase, "users"));
-    const users = usersSnapshot.docs.map((doc) => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
+    const users = usersSnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     return { success: true, data: users };
   } catch (error) {
     return { success: false, message: error.message };
@@ -111,3 +85,25 @@ export const GetUserById = async (id) => {
     return { success: false, message: error.message };
   }
 };
+// Posodobi uporabnika (npr. ime, email ali vlogo)
+export const UpdateUser = async (id, updatedData) => {
+  try {
+    const userRef = doc(firestoreDatabase, "users", id);
+    await updateDoc(userRef, updatedData);
+    return { success: true, message: "User updated successfully" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+
+export const DeleteUser = async (id) => {
+  try {
+    await deleteDoc(doc(firestoreDatabase, "users", id));
+    return { success: true, message: "User deleted successfully" };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+

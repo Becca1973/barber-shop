@@ -25,10 +25,16 @@ function BarbersList() {
   };
 
   const changeStatus = async (payload) => {
+    const action = payload.status === "approved" ? "approve" : "reject";
+    if (!window.confirm(`Are you sure you want to ${action} this barber?`)) {
+      return;
+    }
+
     try {
       dispatch(ShowLoader(true));
       const response = await UpdateBarber(payload);
       dispatch(ShowLoader(false));
+
       if (response.success) {
         message.success(response.message);
         getData();
@@ -77,8 +83,16 @@ function BarbersList() {
     {
       title: "Status",
       dataIndex: "status",
-      render: (text, record) => {
-        return text.toUpperCase();
+      render: (text) => {
+        let color = "black";
+        if (text === "approved") color = "green";
+        else if (text === "pending") color = "orange";
+        else if (text === "rejected") color = "red";
+        return (
+          <span style={{ color, fontWeight: "bold" }}>
+            {text.toUpperCase()}
+          </span>
+        );
       },
     },
     {

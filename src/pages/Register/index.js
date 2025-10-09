@@ -36,7 +36,7 @@ const Register = () => {
   }, []);
 
   return (
-    <div className="flex justify-center h-screen p-2 my-3">
+    <div className="flex justify-center h-screen p-2 marginttop">
       <Form
         layout="vertical"
         className="w-400 rounded h-500 bg-white p-3"
