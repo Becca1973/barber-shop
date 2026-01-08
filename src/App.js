@@ -13,6 +13,7 @@ import Admin from "./pages/Admin";
 import BookAppointment from "./pages/BookAppointment";
 import Welcome from "./pages/Welcome";
 import About from "./pages/About";
+import BookAppointmentB from "./pages/BookAppointment/BookAppointmentB";
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
@@ -55,6 +56,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/book-appointment-b/:id"
+            element={
+              <ProtectedRoute>
+                <BookAppointmentB />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/profile"
             element={
