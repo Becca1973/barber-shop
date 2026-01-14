@@ -752,3 +752,157 @@ hr {
 .footer-info a:hover {
   color: #ff8c00;
 }
+
+
+/* Stran: center + nič raztegovanja čez celo */
+.book-b1-page {
+  background-color: #d6d6d6;
+  min-height: 100vh;
+  padding-top: 60px;
+  padding-bottom: 60px;
+}
+
+/* ozka širina, na sredini */
+.book-b1-container {
+  background-color: #e9e8e8;
+  max-width: 750px; /* po želji: 520–600 */
+  margin: 0 auto;
+  padding: 16px;
+
+}
+
+/* “card” izgled (podobno originalni strani) */
+.book-b1-card {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* manj praznine zgoraj */
+.book-b1-title {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.book-b1-loading {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.book-b1-hr {
+  margin: 14px 0;
+}
+
+/* kompaktni info grid */
+.book-b1-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 8px;
+  column-gap: 10px;
+  font-size: 16px;
+}
+
+.book-b1-info .k {
+  font-weight: 600;
+}
+
+.book-b1-info .v {
+  text-align: right;
+}
+
+/* section spacing */
+.book-b1-section {
+  margin-top: 14px;
+}
+
+.book-b1-h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* vsi inputi enake širine */
+.book-b1-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+/* note */
+.book-b1-note {
+  background: #f3f3f3;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+/* termini: manjši, bolj kompaktni */
+.book-b1-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.book-b1-slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #bbb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.book-b1-slot:hover {
+  border-color: #888;
+}
+
+.book-b1-slot.is-booked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f3f3f3;
+}
+
+.book-b1-slot.is-selected {
+  border-color: green;
+  outline: 2px solid rgba(0, 128, 0, 0.2);
+}
+
+.book-b1-slot-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.book-b1-radio {
+  width: 16px;
+  height: 16px;
+}
+
+.book-b1-slot-text {
+  font-size: 14px;
+}
+
+.book-b1-badge {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ✅ ključni del: ne spreminjamo globalnega .bookBarb v index.css,
+   ampak samo na B1 dodamo override preko dodatnega classa. */
+.bookBarb.book-b1-form {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.book-b1-form label {
+  font-weight: 600; /* ali 700 če želiš še bolj */
+  margin-top: 10px;
+  display: block;
+}
