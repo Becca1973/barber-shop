@@ -23,10 +23,10 @@ function BookAppointmentB1() {
   const [selectedSlot, setSelectedSlot] = useState("");
   const [bookedSlots, setBookedSlots] = useState([]);
 
-  // ✅ SPREMEMBA (B1): pokažemo samo 3 termine naenkrat + "Show more"
+  //  SPREMEMBA (B1): pokažemo samo 3 termine naenkrat + "Show more"
   const [visibleCount, setVisibleCount] = useState(3);
 
-  // ✅ SPREMEMBA (B1): po izbiri termina skrijemo seznam in pokažemo samo izbran termin
+  //  SPREMEMBA (B1): po izbiri termina skrijemo seznam in pokažemo samo izbran termin
   const [isChoosingSlot, setIsChoosingSlot] = useState(true);
 
   const navigate = useNavigate();
@@ -108,7 +108,7 @@ function BookAppointmentB1() {
   }, [id]);
 
   useEffect(() => {
-    // ✅ SPREMEMBA proti originalu:
+    //  SPREMEMBA proti originalu:
     // ko uporabnik spremeni datum, resetiramo izbran termin + "show more" + odpremo seznam terminov
     setSelectedSlot("");
     setVisibleCount(3);
@@ -124,7 +124,7 @@ function BookAppointmentB1() {
 
     const day = moment(date).format("dddd").toLowerCase();
 
-    // ✅ SPREMEMBA (stabilnost): varno mapiranje dni
+    // SPREMEMBA (stabilnost): varno mapiranje dni
     const barberDays = (barber?.days || []).map((d) => (d || "").toLowerCase());
 
     if (!barberDays.includes(day)) {
@@ -158,7 +158,7 @@ function BookAppointmentB1() {
 
       dispatch(ShowLoader(true));
 
-      // ✅ SPREMEMBA (stabilnost): podpiramo barber.id ali barber._id
+      // SPREMEMBA (stabilnost): podpiramo barber.id ali barber._id
       const payload = {
         barberId: barber?._id || barber?.id,
         userId: loggedUser?.id || loggedUser?._id,
@@ -243,7 +243,7 @@ function BookAppointmentB1() {
             />
           </div>
 
-          {/* ✅ B1: izbira termina (3 + Show more) in po izbiri prikažemo samo izbran termin */}
+          {/* B1: izbira termina (3 + Show more) in po izbiri prikažemo samo izbran termin */}
           {date && (
             <div className="book-b1-section">
               <h3 className="book-b1-h3">Select time:</h3>
@@ -284,7 +284,7 @@ function BookAppointmentB1() {
                                   disabled={!!isBooked}
                                   checked={selectedSlot === slot}
                                   onChange={() => {
-                                    // ✅ po izbiri skrijemo seznam in pokažemo izbran termin
+                                    // po izbiri skrijemo seznam in pokažemo izbran termin
                                     setSelectedSlot(slot);
                                     setIsChoosingSlot(false);
                                   }}
@@ -306,7 +306,7 @@ function BookAppointmentB1() {
                         <button
                           type="button"
                           className="contained-btn my-2"
-                          onClick={() => setVisibleCount((v) => v + 3)} // ✅ dodajamo po 3
+                          onClick={() => setVisibleCount((v) => v + 3)} // dodajamo po 3
                         >
                           Show more
                         </button>
@@ -328,9 +328,9 @@ function BookAppointmentB1() {
                         type="button"
                         className="contained-btn my-2"
                         onClick={() => {
-                          // ✅ ko želi spremeniti termin, odpremo seznam
+                          // ko želi spremeniti termin, odpremo seznam
                           setIsChoosingSlot(true);
-                          setVisibleCount(3); // ✅ opcijsko: spet pokaži samo prve 3
+                          setVisibleCount(3); // opcijsko: spet pokaži samo prve 3
                         }}
                       >
                         Change time
